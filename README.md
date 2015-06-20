@@ -1,4 +1,4 @@
-# ios-ble-explorer
+# iOS BLE Explorer
 A very simple explorer to discover Bluetooth LE peripherals, services and characteristics using Core Bluetooth in iOS
 
 This is a native iOS app written in Swift.
