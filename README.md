@@ -10,3 +10,5 @@ This is useful if you just got a new Bluetooth Low Energy (BLE) device without s
 3. Finally, as you tap a service, all its characteristics and values will be displayed in a last table
 
 Have a good time!
+
+p.s.: it doesn't work on some iPads and I need to find out why
