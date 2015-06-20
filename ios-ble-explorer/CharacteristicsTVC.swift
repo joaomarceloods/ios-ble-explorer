@@ -35,7 +35,9 @@ class CharacteristicsTVC: UITableViewController, CBPeripheralDelegate {
 
         let c = characteristics[indexPath.row]
         cell.textLabel?.text = "UUID: \(c.UUID.UUIDString)"
-        cell.detailTextLabel?.text = c.value == nil ? "Value: [none]" : "Value: \(c.value)"
+        cell.detailTextLabel?.text = c.value == nil ? "Value: [none]" : "Value: \(c.value.hexadecimalString().stringFromHexadecimalStringUsingEncoding(NSUTF8StringEncoding)!)"
+        
+        
 
         return cell
     }

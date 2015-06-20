@@ -15,6 +15,8 @@
 		06C915491B34F21C00ED5B63 /* PeripheralsTVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06C915461B34F21C00ED5B63 /* PeripheralsTVC.swift */; };
 		06C9154A1B34F21C00ED5B63 /* ServicesTVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06C915471B34F21C00ED5B63 /* ServicesTVC.swift */; };
 		06C9154D1B34F25500ED5B63 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 06C9154C1B34F25500ED5B63 /* Main.storyboard */; };
+		06F20B8F1B35D31E006706E3 /* String+Hexadecimal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06F20B8E1B35D31E006706E3 /* String+Hexadecimal.swift */; };
+		06F20B911B35D3E0006706E3 /* NSData+Hexadecimal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06F20B901B35D3E0006706E3 /* NSData+Hexadecimal.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -40,6 +42,8 @@
 		06C915461B34F21C00ED5B63 /* PeripheralsTVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PeripheralsTVC.swift; sourceTree = "<group>"; };
 		06C915471B34F21C00ED5B63 /* ServicesTVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ServicesTVC.swift; sourceTree = "<group>"; };
 		06C9154C1B34F25500ED5B63 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
+		06F20B8E1B35D31E006706E3 /* String+Hexadecimal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+Hexadecimal.swift"; sourceTree = "<group>"; };
+		06F20B901B35D3E0006706E3 /* NSData+Hexadecimal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSData+Hexadecimal.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -87,6 +91,8 @@
 				06C9152C1B34F1EB00ED5B63 /* Images.xcassets */,
 				06C9152E1B34F1EB00ED5B63 /* LaunchScreen.xib */,
 				06C915231B34F1EB00ED5B63 /* Supporting Files */,
+				06F20B8E1B35D31E006706E3 /* String+Hexadecimal.swift */,
+				06F20B901B35D3E0006706E3 /* NSData+Hexadecimal.swift */,
 			);
 			path = "ios-ble-explorer";
 			sourceTree = "<group>";
@@ -226,9 +232,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				06F20B8F1B35D31E006706E3 /* String+Hexadecimal.swift in Sources */,
 				06C915481B34F21C00ED5B63 /* CharacteristicsTVC.swift in Sources */,
 				06C9154A1B34F21C00ED5B63 /* ServicesTVC.swift in Sources */,
 				06C915261B34F1EB00ED5B63 /* AppDelegate.swift in Sources */,
+				06F20B911B35D3E0006706E3 /* NSData+Hexadecimal.swift in Sources */,
 				06C915491B34F21C00ED5B63 /* PeripheralsTVC.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -419,6 +427,7 @@
 				06C915411B34F1EB00ED5B63 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		06C915421B34F1EB00ED5B63 /* Build configuration list for PBXNativeTarget "ios-ble-explorerTests" */ = {
 			isa = XCConfigurationList;
@@ -427,6 +436,7 @@
 				06C915441B34F1EB00ED5B63 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
