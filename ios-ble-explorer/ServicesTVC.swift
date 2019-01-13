@@ -20,24 +20,24 @@ class ServicesTVC: UITableViewController, CBPeripheralDelegate {
     // Service chosen by user
     var service: CBService!
     
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         // Re-start scan after coming back from background
         peripheral.delegate = self
         peripheral.discoverServices(nil)
     }
     
-    override func viewWillDisappear(animated: Bool) {
+    override func viewWillDisappear(_ animated: Bool) {
         // Remove all services from the table and array (they will be re-discovered upon viewDidAppear)
-        services.removeAll(keepCapacity: false)
+        services.removeAll(keepingCapacity: false)
         tableView.reloadData()
     }
     
     // MARK: - CBPeripheralDelegate
     
-    func peripheral(peripheral: CBPeripheral!, didDiscoverServices error: NSError!) {
+    func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
         
         if let e = error {
-            println("Failed to discover services: \(e.localizedDescription)")
+            print("Failed to discover services: \(e.localizedDescription)")
             
             UIAlertView(
                 title: "Services failed",
@@ -48,27 +48,25 @@ class ServicesTVC: UITableViewController, CBPeripheralDelegate {
             return
         }
         
-        for service in peripheral.services as! [CBService] {
-            services.append(service)
+        if let peripheralServices = peripheral.services {
+            for service in peripheralServices {
+                services.append(service)
+            }
         }
         self.tableView.reloadData()
     }
     
     // MARK: - Table view data source
 
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return 1
-    }
-
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return services.count
     }
 
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("Service", forIndexPath: indexPath) as! UITableViewCell
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Service", for: indexPath)
         
         let s = services[indexPath.row]
-        cell.textLabel?.text = "UUID: \(s.UUID.UUIDString)"
+        cell.textLabel?.text = "UUID: \(s.uuid.uuidString)"
         cell.detailTextLabel?.text = s.isPrimary ? "This is the primary service" : ""
 
         return cell
@@ -76,17 +74,16 @@ class ServicesTVC: UITableViewController, CBPeripheralDelegate {
     
     // MARK: - Table view delegate
     
-    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         service = services[indexPath.row]
-        performSegueWithIdentifier("Characteristics", sender: self)
+        performSegue(withIdentifier: "Characteristics", sender: self)
     }
 
     // MARK: - Navigation
     
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        let characteristicsTVC = segue.destinationViewController as! CharacteristicsTVC
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        let characteristicsTVC = segue.destination as! CharacteristicsTVC
         characteristicsTVC.peripheral = self.peripheral
         characteristicsTVC.service = self.service
     }
-
 }

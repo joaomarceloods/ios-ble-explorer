@@ -18,26 +18,33 @@ extension String {
     ///
     /// :returns: NSData represented by this hexadecimal string. Returns nil if string contains characters outside the 0-9 and a-f range.
     
-    func dataFromHexadecimalString() -> NSData? {
-        let trimmedString = self.stringByTrimmingCharactersInSet(NSCharacterSet(charactersInString: "<> ")).stringByReplacingOccurrencesOfString(" ", withString: "")
+    func dataFromHexadecimalString() -> Data? {
+        let trimmedString = self.trimmingCharacters(in: CharacterSet(charactersIn: "<> ")).replacingOccurrences(of: " ", with: "")
         
         // make sure the cleaned up string consists solely of hex digits, and that we have even number of them
         
-        var error: NSError?
-        let regex = NSRegularExpression(pattern: "^[0-9a-f]*$", options: .CaseInsensitive, error: &error)
-        let found = regex?.firstMatchInString(trimmedString, options: nil, range: NSMakeRange(0, count(trimmedString)))
-        if found == nil || found?.range.location == NSNotFound || count(trimmedString) % 2 != 0 {
+        do {
+            let regex = try NSRegularExpression(pattern: "^[0-9a-f]*$", options: .caseInsensitive)
+            let found = regex.firstMatch(in: trimmedString, options: [], range: NSMakeRange(0, trimmedString.count))
+            if found == nil || found?.range.location == NSNotFound || trimmedString.count % 2 != 0 {
+                return nil
+            }
+        } catch {
+            print("Unexpected error: \(error).")
             return nil
         }
-        
+
         // everything ok, so now let's build NSData
         
-        let data = NSMutableData(capacity: count(trimmedString) / 2)
-        
-        for var index = trimmedString.startIndex; index < trimmedString.endIndex; index = index.successor().successor() {
-            let byteString = trimmedString.substringWithRange(Range<String.Index>(start: index, end: index.successor().successor()))
-            let num = UInt8(byteString.withCString { strtoul($0, nil, 16) })
-            data?.appendBytes([num] as [UInt8], length: 1)
+        var data = Data(capacity: trimmedString.count / 2)
+        var index = trimmedString.startIndex
+        while index < trimmedString.endIndex {
+            let nextIndex = trimmedString.index(index, offsetBy: 2)
+            let byteString = trimmedString[index..<nextIndex]
+            let num = UInt8(byteString, radix: 16)!
+            data.append(num)
+            
+            index = nextIndex
         }
         
         return data
@@ -51,9 +58,9 @@ extension String {
     ///
     /// :returns: String represented by this hexadecimal string. Returns nil if string contains characters outside the 0-9 and a-f range or if a string cannot be created using the provided encoding
     
-    func stringFromHexadecimalStringUsingEncoding(encoding: NSStringEncoding) -> String? {
+    func stringFromHexadecimalStringUsingEncoding(encoding: String.Encoding) -> String? {
         if let data = dataFromHexadecimalString() {
-            return NSString(data: data, encoding: encoding) as? String
+            return String(data: data, encoding: encoding)
         }
         
         return nil
@@ -65,8 +72,8 @@ extension String {
     ///
     /// :returns: String representation of this String object.
     
-    func hexadecimalStringUsingEncoding(encoding: NSStringEncoding) -> String? {
-        let data = dataUsingEncoding(NSUTF8StringEncoding)
-        return data?.hexadecimalString()
+    func hexadecimalStringUsingEncoding(encoding: String.Encoding) -> String? {
+        let resultingData = data(using: String.Encoding.utf8)
+        return resultingData?.hexadecimalString()
     }
 }
