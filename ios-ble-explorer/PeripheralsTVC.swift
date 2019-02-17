@@ -122,7 +122,7 @@ class PeripheralsTVC: UITableViewController, CBCentralManagerDelegate {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Peripheral", for: indexPath)
 
         let p = peripherals[indexPath.row]
-        cell.textLabel?.text = (p.name != nil || p.name!.isEmpty) ? "[Unkown name]" : p.name
+        cell.textLabel?.text = (p.name == nil || p.name!.isEmpty) ? "[Unkown name]" : p.name
         cell.detailTextLabel?.text = "UUID: \(p.identifier.uuidString)"
 
         return cell

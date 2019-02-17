@@ -30,7 +30,20 @@ class CharacteristicsTVC: UITableViewController, CBPeripheralDelegate {
 
         let c = characteristics[indexPath.row]
         cell.textLabel?.text = "UUID: \(c.uuid.uuidString)"
-        cell.detailTextLabel?.text = c.value == nil ? "Value: [none]" : "Value: \(c.value!.hexadecimalString().stringFromHexadecimalStringUsingEncoding(encoding: String.Encoding.utf8)!)"
+        if c.value == nil {
+            cell.detailTextLabel?.text = "Value: [none]"
+        } else {
+            let hexadecimalString = c.value!.hexadecimalString()
+            print("Hexadecimal string: \(hexadecimalString)")
+            let stringFromHexadecimalString = hexadecimalString.stringFromHexadecimalStringUsingEncoding(encoding: String.Encoding.utf8)
+            if stringFromHexadecimalString != nil {
+                print("From hex string: \(stringFromHexadecimalString!)")
+                cell.detailTextLabel?.text = stringFromHexadecimalString!
+            } else {
+                print("Got no string from hex string")
+                cell.detailTextLabel?.text = "Hex \(hexadecimalString)"
+            }
+        }
         return cell
     }
     
