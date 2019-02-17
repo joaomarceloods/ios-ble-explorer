@@ -27,32 +27,32 @@ class PeripheralsTVC: UITableViewController, CBCentralManagerDelegate {
         centralManager = CBCentralManager(delegate: self, queue: nil)
     }
     
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         // Re-start scan after coming back from background
-        if centralManager.state == .PoweredOn {
-            centralManager.scanForPeripheralsWithServices(nil, options: nil)
+        if centralManager.state == .poweredOn {
+            centralManager.scanForPeripherals(withServices: nil, options: nil)
         }
     }
     
-    override func viewWillDisappear(animated: Bool) {
+    override func viewWillDisappear(_ animated: Bool) {
         // Stop scan to save battery when entering background
         centralManager.stopScan()
         
         // Remove all peripherals from the table and array (they will be re-discovered upon viewDidAppear)
-        peripherals.removeAll(keepCapacity: false)
+        peripherals.removeAll(keepingCapacity: false)
         self.tableView.reloadData()
     }
     
     // MARK: - CBCentralManagerDelegate
     
-    func centralManagerDidUpdateState(central: CBCentralManager!) {
-        println("Central Manager did update state")
+    func centralManagerDidUpdateState(_ central: CBCentralManager) {
+        print("Central Manager did update state")
         
-        if (central.state == .PoweredOn) {
-            println("Bluetooth is powered on")
+        if (central.state == .poweredOn) {
+            print("Bluetooth is powered on")
             
             // Scan for any peripherals
-            centralManager.scanForPeripheralsWithServices(nil, options: nil)
+            centralManager.scanForPeripherals(withServices: nil, options: nil)
         }
         else {
             // Bluetooth is unavailable for some reason
@@ -60,18 +60,18 @@ class PeripheralsTVC: UITableViewController, CBCentralManagerDelegate {
             // Give feedback
             var message = String()
             switch central.state {
-            case .Unsupported:
+            case .unsupported:
                 message = "Bluetooth is unsupported"
-            case .Unknown:
+            case .unknown:
                 message = "Bluetooth state is unkown"
-            case .Unauthorized:
+            case .unauthorized:
                 message = "Bluetooth is unauthorized"
-            case .PoweredOff:
+            case .poweredOff:
                 message = "Bluetooth is powered off"
             default:
                 break
             }
-            println(message)
+            print(message)
             
             UIAlertView(
                 title: "Bluetooth unavailable",
@@ -82,31 +82,31 @@ class PeripheralsTVC: UITableViewController, CBCentralManagerDelegate {
         }
     }
     
-    func centralManager(central: CBCentralManager!, didDiscoverPeripheral peripheral: CBPeripheral!, advertisementData: [NSObject : AnyObject]!, RSSI: NSNumber!) {
-        println("Peripheral discovered: \(peripheral)")
+    func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi: NSNumber) {
+        print("Peripheral discovered: \(peripheral)")
         
         // Add the peripheral to the array to keep reference, otherwise the system will release it and further delegate methods won't be triggered (didConnect, didFail...)
         peripherals.append(peripheral)
         self.tableView.reloadData()
     }
     
-    func centralManager(central: CBCentralManager!, didConnectPeripheral peripheral: CBPeripheral!) {
-        println("Peripheral connected: \(peripheral)")
+    func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
+        print("Peripheral connected: \(peripheral)")
         
         centralManager.stopScan()
         
         // Keep reference to be used in prepareForSegue
         self.peripheral = peripheral
-        performSegueWithIdentifier("Services", sender: self)
+        performSegue(withIdentifier: "Services", sender: self)
     }
     
-    func centralManager(central: CBCentralManager!, didFailToConnectPeripheral peripheral: CBPeripheral!, error: NSError!) {
-        println("Peripheral failed to connect: \(peripheral)")
+    func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
+        print("Peripheral failed to connect: \(peripheral)")
         
         // Give feedback
         UIAlertView(
             title: "Peripheral failed",
-            message: "Peripheral failed to connect: \(error.localizedDescription)",
+            message: "Peripheral failed to connect: \(String(describing: error?.localizedDescription))",
             delegate: nil,
             cancelButtonTitle: "OK")
             .show()
@@ -114,36 +114,30 @@ class PeripheralsTVC: UITableViewController, CBCentralManagerDelegate {
 
     // MARK: - Table view data source
 
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return 1
-    }
-
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return peripherals.count
     }
 
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("Peripheral", forIndexPath: indexPath) as! UITableViewCell
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Peripheral", for: indexPath)
 
         let p = peripherals[indexPath.row]
-        cell.textLabel?.text = p.name.isEmpty ? "[Unkown name]" : p.name
-        cell.detailTextLabel?.text = "UUID: \(p.identifier.UUIDString)"
+        cell.textLabel?.text = (p.name == nil || p.name!.isEmpty) ? "[Unkown name]" : p.name
+        cell.detailTextLabel?.text = "UUID: \(p.identifier.uuidString)"
 
         return cell
     }
     
     // MARK: - Table view delegate
     
-    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        centralManager.connectPeripheral(peripherals[indexPath.row], options: nil)
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        centralManager.connect(peripherals[indexPath.row], options: nil)
     }
 
     // MARK: - Navigation
 
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        let servicesTVC = segue.destinationViewController as! ServicesTVC
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        let servicesTVC = segue.destination as! ServicesTVC
         servicesTVC.peripheral = self.peripheral
     }
-
-
 }

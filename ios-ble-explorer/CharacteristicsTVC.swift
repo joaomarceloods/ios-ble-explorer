@@ -10,44 +10,48 @@ import UIKit
 import CoreBluetooth
 
 class CharacteristicsTVC: UITableViewController, CBPeripheralDelegate {
-    
     var peripheral: CBPeripheral!
     var service: CBService!
     var characteristics = Array<CBCharacteristic>()
     
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         peripheral.delegate = self
-        peripheral.discoverCharacteristics(nil, forService: service)
+        peripheral.discoverCharacteristics(nil, for: service)
     }
 
     // MARK: - Table view data source
 
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return 1
-    }
-
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return characteristics.count
     }
 
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("Characteristic", forIndexPath: indexPath) as! UITableViewCell
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Characteristic", for: indexPath)
 
         let c = characteristics[indexPath.row]
-        cell.textLabel?.text = "UUID: \(c.UUID.UUIDString)"
-        cell.detailTextLabel?.text = c.value == nil ? "Value: [none]" : "Value: \(c.value.hexadecimalString().stringFromHexadecimalStringUsingEncoding(NSUTF8StringEncoding)!)"
-        
-        
-
+        cell.textLabel?.text = "UUID: \(c.uuid.uuidString)"
+        if c.value == nil {
+            cell.detailTextLabel?.text = "Value: [none]"
+        } else {
+            let hexadecimalString = c.value!.hexadecimalString()
+            print("Hexadecimal string: \(hexadecimalString)")
+            let stringFromHexadecimalString = hexadecimalString.stringFromHexadecimalStringUsingEncoding(encoding: String.Encoding.utf8)
+            if stringFromHexadecimalString != nil {
+                print("From hex string: \(stringFromHexadecimalString!)")
+                cell.detailTextLabel?.text = stringFromHexadecimalString!
+            } else {
+                print("Got no string from hex string")
+                cell.detailTextLabel?.text = "Hex \(hexadecimalString)"
+            }
+        }
         return cell
     }
     
     // MARK: - CBPeripheralDelegate
     
-    func peripheral(peripheral: CBPeripheral!, didDiscoverCharacteristicsForService service: CBService!, error: NSError!) {
-        
+    func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
         if let e = error {
-            println("Failed to discover characteristics: \(e.localizedDescription)")
+            print("Failed to discover characteristics: \(e.localizedDescription)")
             
             UIAlertView(
                 title: "Characteristics failed",
@@ -58,25 +62,25 @@ class CharacteristicsTVC: UITableViewController, CBPeripheralDelegate {
             return
         }
         
-        for characteristic in service.characteristics as! [CBCharacteristic] {
-            println("Characteristic discovered: \(characteristic)")
-            
-            characteristics.append(characteristic)
-            peripheral.setNotifyValue(true, forCharacteristic: characteristic)
+        if let serviceCharacteristics = service.characteristics {
+            for characteristic in serviceCharacteristics {
+                print("Characteristic discovered: \(characteristic)")
+                
+                characteristics.append(characteristic)
+                peripheral.setNotifyValue(true, for: characteristic)
+            }
         }
         self.tableView.reloadData()
     }
     
-    func peripheral(peripheral: CBPeripheral!, didUpdateValueForCharacteristic characteristic: CBCharacteristic!, error: NSError!) {
-        
+    func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
         if let e = error {
-            println("Failed to update value for characteristic: \(e.localizedDescription)")
+            print("Failed to update value for characteristic: \(e.localizedDescription)")
             return
         }
         
-        println("Value for characteristic \(characteristic.UUID.UUIDString) is: \(characteristic.value)")
+        print("Value for characteristic \(characteristic.uuid.uuidString) is: \(String(describing: characteristic.value))")
         
         self.tableView.reloadData()
     }
-
 }
